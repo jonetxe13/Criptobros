@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
 		return(0);
 	}
 	//Estimate file size
-    	int nbytes_A =  file_size(fd_in);
+    int nbytes_A =  file_size(fd_in);
 	//Read associated data file
-    	uint8_t* A = malloc(nbytes_A*sizeof(uint8_t));
+    uint8_t* A = malloc(nbytes_A*sizeof(uint8_t));
 	read_file(fd_in, nbytes_A, A);
 	fclose(fd_in);
 

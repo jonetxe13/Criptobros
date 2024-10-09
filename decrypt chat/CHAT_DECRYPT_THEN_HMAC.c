@@ -71,7 +71,14 @@ int main(int argc, char *argv[])
 	HMAC_SHA256(key_HMAC, AES_KEYLEN, C, nbytes_C, HMAC_calc);
 	
 	//Compare received and calculated and indicate if the received message is valid/not valid
-	printf("TAG IS VALID!\n");
+	if (memcmp(HMAC_rec, HMAC_calc, SHA256_BLOCK_SIZE)!=0) {
+		printf("TAG IS NOT VALID!\n");
+	}else
+		printf("TAG IS VALID!\n");
+
+
+
+//	printf("TAG IS VALID!\n");
 	
 	free(all); free(iv); free(C); free(HMAC_rec); free(P); free(HMAC_calc); free(key_encrypt); free(key_HMAC);
 	
@@ -80,7 +87,35 @@ int main(int argc, char *argv[])
 
 void HMAC_SHA256(uint8_t* key, int nbytes_key, uint8_t* P, int nbytes_P, uint8_t* HMAC)
 {
+	uint8_t key_pad[SHA256_INPUT_SIZE];
+	uint8_t o_key_pad[SHA256_INPUT_SIZE];
+	uint8_t i_key_pad[SHA256_INPUT_SIZE];
+	uint8_t hash[SHA256_BLOCK_SIZE];
 	
+	//Prepare key_pad
+	memset(key_pad, 0, SHA256_INPUT_SIZE);
+	memcpy(key_pad, key, nbytes_key);
+	
+	//Prepare i_key_pad
+	for (int i=0; i<SHA256_INPUT_SIZE; i++)
+		i_key_pad[i] = key_pad[i] ^ IPAD;
+	
+	//Prepare o_key_pad
+	for (int i=0; i<SHA256_INPUT_SIZE; i++)
+		o_key_pad[i] = key_pad[i] ^ OPAD;
+	
+	//Calculate inner hash
+	SHA256_CTX ctx;
+	sha256_init(&ctx);
+	sha256_update(&ctx, i_key_pad, SHA256_INPUT_SIZE);
+	sha256_update(&ctx, P, nbytes_P);
+	sha256_final(&ctx, hash);
+	
+	//Calculate outer hash
+	sha256_init(&ctx);
+	sha256_update(&ctx, o_key_pad, SHA256_INPUT_SIZE);
+	sha256_update(&ctx, hash, SHA256_BLOCK_SIZE);
+	sha256_final(&ctx, HMAC);	
 }
 
 

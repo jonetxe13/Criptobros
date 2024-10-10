@@ -69,13 +69,16 @@ int main(int argc, char *argv[])
 	//Calculate HMAC
 	uint8_t* HMAC_calc=calloc(SHA256_BLOCK_SIZE,sizeof(uint8_t));
 	HMAC_SHA256(key_HMAC, AES_KEYLEN, C, nbytes_C, HMAC_calc);
-	
+	printf("print0");
+	print_hex(HMAC_calc, 256);
 	//Compare received and calculated and indicate if the received message is valid/not valid
+	printf("print0.2");
 	if (memcmp(HMAC_rec, HMAC_calc, SHA256_BLOCK_SIZE)!=0) {
 		printf("TAG IS NOT VALID!\n");
 	}else
 		printf("TAG IS VALID!\n");
 
+	printf("print0.1");
 
 
 //	printf("TAG IS VALID!\n");
@@ -87,34 +90,46 @@ int main(int argc, char *argv[])
 
 void HMAC_SHA256(uint8_t* key, int nbytes_key, uint8_t* P, int nbytes_P, uint8_t* HMAC)
 {
-	uint8_t key_pad[SHA256_INPUT_SIZE];
-	uint8_t o_key_pad[SHA256_INPUT_SIZE];
-	uint8_t i_key_pad[SHA256_INPUT_SIZE];
+	uint8_t key_pad[SHA256_BLOCK_SIZE];
+	uint8_t o_key_pad[SHA256_BLOCK_SIZE];
+	uint8_t i_key_pad[SHA256_BLOCK_SIZE];
 	uint8_t hash[SHA256_BLOCK_SIZE];
 	
+	uint8_t* texto;  
+	memcpy(texto, "53616D706C65206D65737361676520666F72206B65796C656E3D626C6F636B6C656E" , nbytes_P);
+
+	uint8_t* keyNueva;    
+	memcpy(keyNueva, "000102030405060708090A0B0C0D0E0F101112131415161718191A1B1C1D1E1F202122232425262728292A2B2C2D2E2F303132333435363738393A3B3C3D3E3F", nbytes_key);
 	//Prepare key_pad
-	memset(key_pad, 0, SHA256_INPUT_SIZE);
-	memcpy(key_pad, key, nbytes_key);
+	printf("print1");
+	memset(key_pad, 0, SHA256_BLOCK_SIZE);
+	memcpy(key_pad, keyNueva, nbytes_key);
 	
+	printf("print2");
 	//Prepare i_key_pad
-	for (int i=0; i<SHA256_INPUT_SIZE; i++)
+	for (int i=0; i<SHA256_BLOCK_SIZE; i++)
 		i_key_pad[i] = key_pad[i] ^ IPAD;
 	
+	printf("print3");
 	//Prepare o_key_pad
-	for (int i=0; i<SHA256_INPUT_SIZE; i++)
+	for (int i=0; i<SHA256_BLOCK_SIZE; i++)
 		o_key_pad[i] = key_pad[i] ^ OPAD;
 	
+	printf("print4");
 	//Calculate inner hash
 	SHA256_CTX ctx;
 	sha256_init(&ctx);
-	sha256_update(&ctx, i_key_pad, SHA256_INPUT_SIZE);
-	sha256_update(&ctx, P, nbytes_P);
+	sha256_update(&ctx, i_key_pad, SHA256_BLOCK_SIZE);
+	sha256_update(&ctx, texto, nbytes_P);
 	sha256_final(&ctx, hash);
 	
+	printf("print5");
 	//Calculate outer hash
 	sha256_init(&ctx);
-	sha256_update(&ctx, o_key_pad, SHA256_INPUT_SIZE);
-	sha256_update(&ctx, hash, SHA256_BLOCK_SIZE);
+	printf("print6");
+	sha256_update(&ctx, o_key_pad, SHA256_BLOCK_SIZE);
+	printf("print7");
+	sha256_update(&ctx, hash, 64); //esto probablemente este mal
 	sha256_final(&ctx, HMAC);	
 }
 

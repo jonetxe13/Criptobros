@@ -71,7 +71,14 @@ int main(int argc, char *argv[])
 	HMAC_SHA256(key_HMAC, AES_KEYLEN, C, nbytes_C, HMAC_calc);
 	
 	//Compare received and calculated and indicate if the received message is valid/not valid
-	printf("TAG IS VALID!\n");
+	print_c(HMAC_calc,sizeof(HMAC_calc));
+	print_hex(HMAC_calc,sizeof(HMAC_calc));
+	if(memcmp(HMAC_rec, HMAC_calc,32)==0){
+		printf("TAG IS VALID!\n");
+	}
+	else{
+				printf("TAG IS NOT VALID\n");
+	}
 	
 	free(all); free(iv); free(C); free(HMAC_rec); free(P); free(HMAC_calc); free(key_encrypt); free(key_HMAC);
 	
@@ -79,23 +86,48 @@ int main(int argc, char *argv[])
 }
 
 void HMAC_SHA256(uint8_t* key, int nbytes_key, uint8_t* P, int nbytes_P, uint8_t* HMAC)
-{
-    uint8_t* K0 = malloc(nbytes_P*sizeof(uint8_t));
-    int i;
-    if(nbytes_P < nbytes_key){
-	memcpy(K0, key, 256);
-	for(i = 0; i<256; i++){
-	    if(K0[i] == '0')
-		K0[i] = 0;
+{   	
+	uint8_t k_ipad[SHA256_INPUT_SIZE];    // key XORd with ipad
+    uint8_t k_opad[SHA256_INPUT_SIZE];    // key XORd with opad
+    uint8_t temp_key[SHA256_BLOCK_SIZE];
+    SHA256_CTX context;
+    uint8_t temp[32];
+    
+    // Step 1: If key is longer than the block size, hash it
+    if (nbytes_key > SHA256_INPUT_SIZE) {
+        sha256_init(&context);
+        sha256_update(&context, key, nbytes_key);
+        sha256_final(&context, temp_key);
+        key = temp_key;
+        nbytes_key = 32;
+    }else {
+		//memcpy(key, key, nbytes_key);
+		for(int i = nbytes_key; i < SHA256_BLOCK_SIZE; i++) {
+			key[i] = 0x00;
+		}
 	}
+    // Step 2: Prepare the key pads
+    memset(k_ipad, 0, SHA256_INPUT_SIZE);
+    memset(k_opad, 0, SHA256_INPUT_SIZE);
+    memcpy(k_ipad, key, nbytes_key);
+    memcpy(k_opad, key, nbytes_key);
+    
+    for (int i = 0; i < SHA256_INPUT_SIZE; i++) {
+        k_ipad[i] ^= IPAD;
+        k_opad[i] ^= OPAD;
     }
-    else if(nbytes_P == nbytes_key){
-	memcpy(K0, key, 256);
-    } else {
-
-    }
-    	
-	
+    
+    // Step 3: Inner hash
+    sha256_init(&context);
+    sha256_update(&context, k_ipad, SHA256_INPUT_SIZE);
+    sha256_update(&context, P, nbytes_P);
+    sha256_final(&context, temp);
+    
+    // Step 4: Outer hash
+    sha256_init(&context);
+    sha256_update(&context, k_opad, SHA256_INPUT_SIZE);
+    sha256_update(&context, temp, 32);
+    sha256_final(&context, HMAC);
 }
 
 

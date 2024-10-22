@@ -70,7 +70,12 @@ int main(int argc, char *argv[])
 	print_c(P, nbytes_P);
 	
 	//Check if nbytes is 0 and indicate if the received message is valid/not valid
-	printf("TAG IS VALID!\n");
+	if (nbytes_P == 0) {
+        printf("TAG IS NOT VALID!\n");
+    } else {
+        printf("TAG IS VALID!\n");
+    }
+
 
 	free(all); free(C); free(nonce); free(P); free(key);
 }

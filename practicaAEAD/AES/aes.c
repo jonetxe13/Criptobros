@@ -892,10 +892,23 @@ int AES_CCM_decrypt(const uint8_t* C, int nbytes_C, const uint8_t* nonce, int nb
 	CCM_formating_B(P, nbytes_P, nonce, nbytes_nonce, A, nbytes_A, nbytes_T, B);
 	
 	//CALCULATE T_calc and return nbytes_P=0 and an empty P if tag is invalid
-		
-	free(B); free(iv); free(T_rec); 
-	
-	return(nbytes_P);
+	uint8_t T_calc[nbytes_T];
+    calculate_tag_AES_CCM(B, nbytes_B, key, T_calc, nbytes_T);
+
+    if (memcmp(T_rec, T_calc, nbytes_T) != 0) {
+        free(B);
+        free(iv);
+        free(T_rec);
+        nbytes_P = 0;
+        P = NULL;
+        return 0;
+    }
+
+    free(B);
+    free(iv);
+    free(T_rec);
+    return nbytes_P;
+
 }
 // -------------------------------------
 

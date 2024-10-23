@@ -681,26 +681,27 @@ int AES_GCM_decrypt(uint8_t* buf, int nbytes_buf, const uint8_t* iv, int nbytes_
 	uint8_t* J0=calloc(AES_BLOCKLEN, sizeof(uint8_t)); // Initialize J0 to 0
 	calculate_J0(iv, nbytes_iv, H, J0);
 	
-	uint8_t* tag=calloc(AES_BLOCKLEN, sizeof(uint8_t));
+	uint8_t* tag=malloc(AES_BLOCKLEN * sizeof(uint8_t));
 
 	//CALCULAR TAG
 	 //Calculate S as GHASH of temp2 with key H.
-	uint8_t* S=calloc(AES_BLOCKLEN, sizeof(uint8_t));
+	uint8_t* S=malloc(AES_BLOCKLEN * sizeof(uint8_t));
 	calculate_S(buf, nbytes_buf, A, nbytes_A, H, S);
 	 //Encrypt S to obtain calculated tag. The calculated tag is stored in S
-	J0[AES_BLOCKLEN-1] += 1; //revert inc32(J0) 
+	// J0[AES_BLOCKLEN-1] += 1; //revert inc32(J0) 
 	AES_CTR_xcrypt(S, AES_BLOCKLEN, J0, key);
 	 //Store result in tag
 	memcpy(tag, S, AES_BLOCKLEN);
 
 	//if tag is not valid set buf to 0
-    int valid;
+    int valid = 1;
 	if (memcmp(tag, T, AES_BLOCKLEN) != 0) {
 		valid = 0;
 		memset(buf, 0, nbytes_buf);
 	}
 	else{
-		valid = 1;
+		J0[AES_BLOCKLEN-1]++; //revert inc32(J0) 
+		AES_CTR_xcrypt(buf, nbytes_buf, J0, key);
 	}
 	printf("T_rec: ");
     for (int i = 0; i < AES_BLOCKLEN; i++) {

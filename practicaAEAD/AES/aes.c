@@ -807,9 +807,9 @@ static void calculate_iv_AES_CCM(const uint8_t* nonce, int n, uint8_t* iv)
 static void calculate_tag_AES_CCM(const uint8_t* B, int nblocks_B, const uint8_t* key, uint8_t* T, int t)
 {
  	//Declare buffer of 16 bytes to calculate tag
-      	uint8_t* buf=calloc(AES_BLOCKLEN,sizeof(uint8_t));
+		uint8_t* buf = calloc(AES_BLOCKLEN, sizeof(uint8_t));
 
-	//Initualize ctx vaiable of AES      	
+	//Initialize ctx variable of AES      	
       	struct AES_ctx ctx;      	
       	AES_init_ctx(&ctx, key);
       	
@@ -819,7 +819,7 @@ static void calculate_tag_AES_CCM(const uint8_t* B, int nblocks_B, const uint8_t
 	
 	//The rest of the encryption is similar to CBC
 	int i;
-  	for (i = 0; i < nblocks_B-1; i++) {
+	for (i = 0; i < nblocks_B - 1; i++) {
 		B += AES_BLOCKLEN;
 		xor(buf, B, AES_BLOCKLEN);
 		Cipher((state_t*)buf, ctx.RoundKey);	
@@ -892,9 +892,19 @@ int AES_CCM_decrypt(const uint8_t* C, int nbytes_C, const uint8_t* nonce, int nb
 	CCM_formating_B(P, nbytes_P, nonce, nbytes_nonce, A, nbytes_A, nbytes_T, B);
 	
 	//CALCULATE T_calc and return nbytes_P=0 and an empty P if tag is invalid
-	uint8_t T_calc[nbytes_T];
-    calculate_tag_AES_CCM(B, nbytes_B, key, T_calc, nbytes_T);
+	    uint8_t T_calc[nbytes_T];
+    calculate_tag_AES_CCM(B, nbytes_B/AES_BLOCKLEN, key, T_calc, nbytes_T);
+	printf("T_rec: ");
+    for (int i = 0; i < nbytes_T; i++) {
+        printf("%02x", T_rec[i]);
+    }
+    printf("\n");
 
+    printf("T_calc: ");
+    for (int i = 0; i < nbytes_T; i++) {
+        printf("%02x", T_calc[i]);
+    }
+    printf("\n");
     if (memcmp(T_rec, T_calc, nbytes_T) != 0) {
         free(B);
         free(iv);
@@ -903,7 +913,6 @@ int AES_CCM_decrypt(const uint8_t* C, int nbytes_C, const uint8_t* nonce, int nb
         P = NULL;
         return 0;
     }
-
     free(B);
     free(iv);
     free(T_rec);

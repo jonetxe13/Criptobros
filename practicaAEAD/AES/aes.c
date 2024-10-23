@@ -681,18 +681,21 @@ int AES_GCM_decrypt(uint8_t* buf, int nbytes_buf, const uint8_t* iv, int nbytes_
 	uint8_t* J0=calloc(AES_BLOCKLEN, sizeof(uint8_t)); // Initialize J0 to 0
 	calculate_J0(iv, nbytes_iv, H, J0);
 	
-	//DECRYPT buf with CTR (iv=inc32(J0))
-	J0[AES_BLOCKLEN-1] += 1; //revert inc32(J0) 
-	AES_CTR_xcrypt(buf, nbytes_buf, J0, key);
-
-	//Calculate Tag and compare it with received tag return valid=1 if received tag and calculated tag are equal
 	uint8_t* tag=calloc(AES_BLOCKLEN, sizeof(uint8_t));
-	calculate_S(buf, nbytes_buf, A, nbytes_A, H, tag);
+	// J0[AES_BLOCKLEN-1]++;
+	// AES_CTR_xcrypt(buf, nbytes_buf, J0, key);
+	
+	//CALCULAR TAG
+	 //Calculate S as GHASH of temp2 with key H.
+	uint8_t* S=calloc(AES_BLOCKLEN, sizeof(uint8_t));
+	calculate_S(buf, nbytes_buf, A, nbytes_A, H, S);
+	 //Encrypt S to obtain calculated tag. The calculated tag is stored in S
+	J0[AES_BLOCKLEN-1] += 1; //revert inc32(J0) 
+	AES_CTR_xcrypt(S, AES_BLOCKLEN, J0, key);
+	 //Store result in T
+	memcpy(tag, S, AES_BLOCKLEN);
 
-	J0[AES_BLOCKLEN-1] -= 1; //revert inc32(J0) 
-	AES_CTR_xcrypt(buf, nbytes_buf, J0, key);
-
-		printf("T_rec: ");
+	printf("T_rec: ");
     for (int i = 0; i < AES_BLOCKLEN; i++) {
         printf("%02x", T[i]);
     }

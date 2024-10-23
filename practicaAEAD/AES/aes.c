@@ -681,20 +681,39 @@ int AES_GCM_decrypt(uint8_t* buf, int nbytes_buf, const uint8_t* iv, int nbytes_
 	uint8_t* J0=calloc(AES_BLOCKLEN, sizeof(uint8_t)); // Initialize J0 to 0
 	calculate_J0(iv, nbytes_iv, H, J0);
 	
-	//Calculate Tag and compare it with received tag return valid=1 if received tag and calculated tag are equal
-	//if tag is not valid set buf to 0
-	//esto lo he puesto yoooooooooooooooooooooooooooooooooooo
-	int valid = 0;
-	if(T == J0){
-		return valid=1;
-	} else
-		buf=0;
-
 	//DECRYPT buf with CTR (iv=inc32(J0))
-	J0[AES_BLOCKLEN-1] += 1;
+	J0[AES_BLOCKLEN-1] += 1; //revert inc32(J0) 
 	AES_CTR_xcrypt(buf, nbytes_buf, J0, key);
-	
-	
+
+	//Calculate Tag and compare it with received tag return valid=1 if received tag and calculated tag are equal
+	uint8_t* tag=calloc(AES_BLOCKLEN, sizeof(uint8_t));
+	calculate_S(buf, nbytes_buf, A, nbytes_A, H, tag);
+
+	J0[AES_BLOCKLEN-1] -= 1; //revert inc32(J0) 
+	AES_CTR_xcrypt(buf, nbytes_buf, J0, key);
+
+		printf("T_rec: ");
+    for (int i = 0; i < AES_BLOCKLEN; i++) {
+        printf("%02x", T[i]);
+    }
+    printf("\n");
+
+    printf("T_calc: ");
+    for (int i = 0; i < AES_BLOCKLEN; i++) {
+        printf("%02x", tag[i]);
+    }
+    printf("\n");
+	//if tag is not valid set buf to 0
+    int valid;
+	if (strcmp(tag, T) != 0) {
+		valid = 0;
+		memset(buf, 0, nbytes_buf);
+	}
+	else{
+		valid = 1;
+	}
+
+
 	free(H); free(J0);  
 	
 	return valid;

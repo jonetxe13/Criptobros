@@ -309,7 +309,10 @@ int test_decrypt_AES_GCM(void)
 	// -------------------------------------
         
 	int valid=AES_GCM_decrypt(C, nbytes_C, iv, nbytes_iv, key, A, nbytes_A, T);
-	printf("AES-GCM decrypt: ");
+	printf("Plaintext: ");
+	print_c(C, nbytes_C);
+
+	printf("\nAES-GCM decrypt: ");
 	if (!valid)	{
 		printf("TAG IS NOT VALID!\n");
 		return(1);

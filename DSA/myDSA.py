@@ -100,6 +100,18 @@ class DSA:
         if not self.p:
             raise Exception('Cannot verify. Public key not set.')
         
-        # Compute v and r
+        r = signature >> 160
+        s = signature & ((1 << 160) - 1)
+        
+        if not (0 < r < self.q) or not (0 < s < self.q):
+            return False
+        
+        digest = hashlib.sha1(m).digest()
+        h = int.from_bytes(digest, 'big')
+        
+        w = pow(s, -1, self.q)
+        u1 = (h * w) % self.q
+        u2 = (r * w) % self.q
+        v = ((pow(self.alpha, u1, self.p) * pow(self.beta, u2, self.p)) % self.p) % self.q
         
         return v == r

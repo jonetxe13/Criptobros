@@ -678,7 +678,7 @@ int AES_GCM_decrypt(uint8_t* buf, int nbytes_buf, const uint8_t* iv, int nbytes_
 	AES_ECB_encrypt(H, 1, key); //Calculate AES_K(0^128)
 	
 	//Calculate J0 dependiendo de la longitud de iv
-	uint8_t* J0=calloc(AES_BLOCKLEN, sizeof(uint8_t)); // Initialize J0 to 0
+	uint8_t* J0=calloc(nbytes_iv, sizeof(uint8_t)); // Initialize J0 to 0
 	calculate_J0(iv, nbytes_iv, H, J0);
 	
 	uint8_t* tag=malloc(AES_BLOCKLEN * sizeof(uint8_t));

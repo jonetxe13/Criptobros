@@ -48,6 +48,27 @@ class DSA:
             self.alpha = int(line, 16)
             line = f.readline()
             self.beta = int(line, 16)
+    
+    def calculate_private_key(dsa, signatures): 
+        signature_pairs = [(sig >> 160, sig & ((1 << 160) - 1)) for sig in signatures]
+        for i in range(len(signature_pairs)): 
+            for j in range(i + 1, len(signature_pairs)): 
+                if signature_pairs[i][0] == signature_pairs[j][0]: 
+                    r = signature_pairs[i][0] 
+                    s1, s2 = signature_pairs[i][1], signature_pairs[j][1]
+                    with open(f"{FILES_PATH}/ipsum.txt", "rb") as f: m1 = f.read() 
+                    with open(f"{FILES_PATH}/lorem.txt", "rb") as f: m2 = f.read()
+
+                    H_m1 = int(hashlib.sha1(m1).hexdigest(), 16) 
+                    H_m2 = int(hashlib.sha1(m2).hexdigest(), 16)
+
+                    #calcular k
+                    k = ((H_m1 - H_m2) * pow((s1 - s2), -1, dsa.q)) % dsa.q
+
+                    x = ((s1 * k - H_m1) * pow(r, -1, dsa.q)) % dsa.q
+
+                    return x
+        return None
 
     def read_privatekey(self, filename):
         '''

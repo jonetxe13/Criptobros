@@ -11,6 +11,9 @@ def main():
     dsa = DSA()
     dsa.read_publickey(PUBLICKEY_FILENAME)
     filenames, signatures = read_signatures(SIGNATURES_FILENAME)
+    
+    print(dsa.calculate_private_key(dsa, signatures))
+    
 
     for filename, signature in zip(filenames, signatures):
         with open(os.path.join(FILES_PATH, filename), "rb") as f:

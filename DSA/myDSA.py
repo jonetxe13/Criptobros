@@ -32,7 +32,7 @@ class DSA:
         self.q = q
         self.alpha = alpha
         self.beta = beta
-        self.d = d
+        self.d = 653633527604250031520881010531776565548374460673
     
     def read_publickey(self, filename):
         '''
@@ -56,8 +56,8 @@ class DSA:
                 if signature_pairs[i][0] == signature_pairs[j][0]: 
                     r = signature_pairs[i][0] 
                     s1, s2 = signature_pairs[i][1], signature_pairs[j][1]
-                    with open(f"{FILES_PATH}/ipsum.txt", "rb") as f: m1 = f.read() 
-                    with open(f"{FILES_PATH}/lorem.txt", "rb") as f: m2 = f.read()
+                    with open(f"files/ipsum.txt", "rb") as f: m1 = f.read() 
+                    with open(f"files/lorem.txt", "rb") as f: m2 = f.read()
 
                     H_m1 = int(hashlib.sha1(m1).hexdigest(), 16) 
                     H_m2 = int(hashlib.sha1(m2).hexdigest(), 16)

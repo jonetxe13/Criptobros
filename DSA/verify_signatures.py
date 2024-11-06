@@ -12,7 +12,12 @@ def main():
     dsa.read_publickey(PUBLICKEY_FILENAME)
     filenames, signatures = read_signatures(SIGNATURES_FILENAME)
     
-    print(dsa.calculate_private_key(dsa, signatures))
+    pk = dsa.calculate_private_key(signatures)
+    sig = dsa.sign("Funcionas?")
+    if dsa.verify("Funcionas?", sig):
+        print(f'[{filename}]: Valid signature.')
+    else:
+        print(f'[{filename}]: Invalid signature.')
     
 
     for filename, signature in zip(filenames, signatures):

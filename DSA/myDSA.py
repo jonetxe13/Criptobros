@@ -32,7 +32,7 @@ class DSA:
         self.q = q
         self.alpha = alpha
         self.beta = beta
-        self.d = 653633527604250031520881010531776565548374460673
+        self.d = d
     
     def read_publickey(self, filename):
         '''
@@ -103,7 +103,9 @@ class DSA:
     def sign(self, m):
         '''
         Sign a message, m.
+
         '''
+        
         if not self.d:
             raise Exception('Cannot sign. Private key not set.')
         digest = hashlib.sha1(m).digest()

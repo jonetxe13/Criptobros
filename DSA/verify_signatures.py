@@ -16,12 +16,13 @@ def main():
     dsa.write_privatekey("filePrivateKey.txt")
     
     sig = dsa.sign("Funcionas?".encode())
+    print('Validar clave privada:')
     if dsa.verify("Funcionas?".encode(), sig):
-        print(f'Valid signature.')
+        print(' Valid signature.')
     else:
-        print(f'Invalid signature.')
+        print(' Invalid signature.')
     
-
+    print('\nVerificar archivos firmados:')
     for filename, signature in zip(filenames, signatures):
         with open(os.path.join(FILES_PATH, filename), "rb") as f:
             data = f.read()

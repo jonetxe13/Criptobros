@@ -16,15 +16,30 @@ int main(int argc, char **argv) {
     // Define a nonce (initialization vector) of required size for encryption, initialized with example values
     unsigned char nonce[CRYPTO_NPUBBYTES] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x09, 0x0a, 0x0b, 0x0c, 0x0d, 0x0e, 0x0f };
     int n = atoi(argv[1]); 
-    int original_length = 16; 
-    int total_length = 16 * pow(2,n);
-    unsigned char *plaintext = malloc((total_length +1)* sizeof(unsigned char));  
-    strcpy((char*)plaintext, "Your mesage here");
-    // Define the plaintext message
+    char *original_message = "YourmessagehereeYourmessageheree"; 
+    int original_length = strlen(original_message); 
+    int total_length = original_length * (1 << n); // Total length after n duplications
+
+    unsigned char *plaintext = malloc((total_length + 1) * sizeof(unsigned char));  
+    if (plaintext == NULL) {
+        fprintf(stderr, "Error al asignar memoria para plaintext\n");
+        return 1;
+    }
+
+    // Copiar el mensaje original en el buffer
+    strcpy((char *)plaintext, original_message);
+    int current_length = original_length;
+
+    // Duplicar el mensaje n veces
     for (int i = 0; i < n; i++) {
-        strcat((char*)plaintext, (char*)plaintext);
-    }   
-    unsigned long long plaintext_len = strlen((char*) plaintext); 
+        memcpy(plaintext + current_length, plaintext, current_length);
+        current_length *= 2;
+    }
+
+    // Añadir el terminador nulo
+    plaintext[total_length] = '\0';
+
+    unsigned long long plaintext_len = total_length;
     
     // Define associated data (optional additional data) for authenticated encryption
     unsigned char associated_data[] = "Optional AD";
@@ -63,6 +78,8 @@ int main(int argc, char **argv) {
     // Free allocated memory
     free(ciphertext);
     free(decrypted);
+    // Liberar memoria asignada
+    free(plaintext);
     
     return 0;
 }

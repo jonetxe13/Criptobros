@@ -1,0 +1,48 @@
+Key size: 32 bytes
+La media de los resultados de cifrado es: 1.50075 us
+La desviación típica de los resultados de cifrado es: 0.561997 us
+La media de los resultados de descifrado es: 1.38613 us
+La desviación típica de los resultados de descifrado es: 0.957654 us
+
+Key size: 64 bytes
+La media de los resultados de cifrado es: 1.57681 us
+La desviación típica de los resultados de cifrado es: 0.738386 us
+La media de los resultados de descifrado es: 1.47209 us
+La desviación típica de los resultados de descifrado es: 0.953091 us
+
+Key size: 96 bytes
+La media de los resultados de cifrado es: 1.96604 us
+La desviación típica de los resultados de cifrado es: 6.82683 us
+La media de los resultados de descifrado es: 1.64012 us
+La desviación típica de los resultados de descifrado es: 0.860992 us
+
+Key size: 128 bytes
+La media de los resultados de cifrado es: 2.29703 us
+La desviación típica de los resultados de cifrado es: 6.17605 us
+La media de los resultados de descifrado es: 1.96456 us
+La desviación típica de los resultados de descifrado es: 1.05234 us
+
+Key size: 160 bytes
+La media de los resultados de cifrado es: 2.72054 us
+La desviación típica de los resultados de cifrado es: 5.78458 us
+La media de los resultados de descifrado es: 2.37566 us
+La desviación típica de los resultados de descifrado es: 1.31134 us
+
+Key size: 192 bytes
+La media de los resultados de cifrado es: 3.7443 us
+La desviación típica de los resultados de cifrado es: 8.4831 us
+La media de los resultados de descifrado es: 3.2689 us
+La desviación típica de los resultados de descifrado es: 3.25027 us
+
+Key size: 224 bytes
+La media de los resultados de cifrado es: 5.10343 us
+La desviación típica de los resultados de cifrado es: 8.62262 us
+La media de los resultados de descifrado es: 4.61584 us
+La desviación típica de los resultados de descifrado es: 4.51272 us
+
+Key size: 256 bytes
+La media de los resultados de cifrado es: 7.91094 us
+La desviación típica de los resultados de cifrado es: 11.1801 us
+La media de los resultados de descifrado es: 7.37506 us
+La desviación típica de los resultados de descifrado es: 8.66574 us
+

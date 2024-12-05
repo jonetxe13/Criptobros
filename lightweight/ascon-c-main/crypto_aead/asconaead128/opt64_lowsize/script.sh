@@ -1,11 +1,11 @@
 #!/bin/bash
 
-gcc test.c $1.c -o test -O2 -march=native -lm
+gcc ./aead.c ./test.c ./crypto_aead.c ./update.c ./permutations.c ./printstate.c -o test -O2 -march=native -lm
 
 # Archivos temporales para almacenar los resultados
 enc_file="results_enc.txt"
 dec_file="results_dec.txt"
-archivo=$1
+archivo="opt64_lowsize"
 
 # Limpiar archivos temporales
 > $enc_file

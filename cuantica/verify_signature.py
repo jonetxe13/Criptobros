@@ -3,7 +3,7 @@
 import sys, os
 from myOTS import LD_OTS
 
-TOVERIFY=os.path.join('files','lorem.pdf')
+TOVERIFY='lorem.pdf'
 PUBLICKEY_FILENAME='public'
 
 def main(signature_filename):

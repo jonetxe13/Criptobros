@@ -66,5 +66,15 @@ class LD_OTS:
         with the public key.
         '''
         assert self.public, 'No public key available'
-        # To be implemented
+        r = signature[0]
+        h = hashlib.sha256(r + message).digest()
+
+        for ibyte, byte in enumerate(h):
+            bits = format(byte, 'b').zfill(8)
+            for ibit, bit in enumerate(bits):
+                pub_key_part = self.public[int(bit)][ibyte*8 + ibit]
+                sig_part = signature[1 + ibyte*8 + ibit]
+                if hashlib.sha256(sig_part).digest() != pub_key_part:
+                    return False
+        return True
 
